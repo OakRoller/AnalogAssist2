@@ -187,3 +187,6 @@ struct WatchRootView: View {
         )
     }
 }
+#Preview {
+    WatchRootView()
+}

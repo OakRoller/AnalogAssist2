@@ -1706,3 +1706,6 @@ struct CameraView_macOS: NSViewRepresentable {
     }
 }
 #endif
+#Preview {
+    SegmentedCameraRootView()
+}
