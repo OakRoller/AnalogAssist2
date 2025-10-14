@@ -1,0 +1,1021 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		85C4053A2E97F66400A5F634 /* DETRResnet50SemanticSegmentationF16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 85C405392E97F66400A5F634 /* DETRResnet50SemanticSegmentationF16.mlpackage */; };
+		85C405452E996F1E00A5F634 /* DeepLabV3.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 85C405442E996F1E00A5F634 /* DeepLabV3.mlmodel */; };
+		85C4066F2E9E75AD00A5F634 /* AnalogAssist2Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 85C4064F2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		85352C5C2DBA897D00E09271 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85352C422DBA897B00E09271 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85352C492DBA897B00E09271;
+			remoteInfo = AnalogAssist2;
+		};
+		85352C662DBA897D00E09271 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85352C422DBA897B00E09271 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85352C492DBA897B00E09271;
+			remoteInfo = AnalogAssist2;
+		};
+		85C4065C2E9E75AC00A5F634 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85352C422DBA897B00E09271 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85C4064E2E9E75AA00A5F634;
+			remoteInfo = "AnalogAssist2Watch Watch App";
+		};
+		85C406662E9E75AD00A5F634 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85352C422DBA897B00E09271 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85C4064E2E9E75AA00A5F634;
+			remoteInfo = "AnalogAssist2Watch Watch App";
+		};
+		85C4066D2E9E75AD00A5F634 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85352C422DBA897B00E09271 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85C4064E2E9E75AA00A5F634;
+			remoteInfo = "AnalogAssist2Watch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		85C406442E9E74A000A5F634 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				85C4066F2E9E75AD00A5F634 /* AnalogAssist2Watch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		85352C4A2DBA897B00E09271 /* AnalogAssist2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AnalogAssist2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		85352C5B2DBA897D00E09271 /* AnalogAssist2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnalogAssist2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		85352C652DBA897D00E09271 /* AnalogAssist2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnalogAssist2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		85C405392E97F66400A5F634 /* DETRResnet50SemanticSegmentationF16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = DETRResnet50SemanticSegmentationF16.mlpackage; sourceTree = "<group>"; };
+		85C405442E996F1E00A5F634 /* DeepLabV3.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DeepLabV3.mlmodel; sourceTree = "<group>"; };
+		85C4064F2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AnalogAssist2Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		85C4065B2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "AnalogAssist2Watch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		85C406652E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "AnalogAssist2Watch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		85352C4C2DBA897B00E09271 /* AnalogAssist2 */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AnalogAssist2;
+			sourceTree = "<group>";
+		};
+		85352C5E2DBA897D00E09271 /* AnalogAssist2Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AnalogAssist2Tests;
+			sourceTree = "<group>";
+		};
+		85352C682DBA897D00E09271 /* AnalogAssist2UITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AnalogAssist2UITests;
+			sourceTree = "<group>";
+		};
+		85C406502E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "AnalogAssist2Watch Watch App";
+			sourceTree = "<group>";
+		};
+		85C4065E2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "AnalogAssist2Watch Watch AppTests";
+			sourceTree = "<group>";
+		};
+		85C406682E9E75AD00A5F634 /* AnalogAssist2Watch Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "AnalogAssist2Watch Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		85352C472DBA897B00E09271 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85352C582DBA897D00E09271 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85352C622DBA897D00E09271 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C4064C2E9E75AA00A5F634 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C406582E9E75AC00A5F634 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C406622E9E75AC00A5F634 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		85352C412DBA897B00E09271 = {
+			isa = PBXGroup;
+			children = (
+				85352C4C2DBA897B00E09271 /* AnalogAssist2 */,
+				85352C5E2DBA897D00E09271 /* AnalogAssist2Tests */,
+				85352C682DBA897D00E09271 /* AnalogAssist2UITests */,
+				85C406502E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */,
+				85C4065E2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests */,
+				85C406682E9E75AD00A5F634 /* AnalogAssist2Watch Watch AppUITests */,
+				85352C4B2DBA897B00E09271 /* Products */,
+				85C405392E97F66400A5F634 /* DETRResnet50SemanticSegmentationF16.mlpackage */,
+				85C405442E996F1E00A5F634 /* DeepLabV3.mlmodel */,
+			);
+			sourceTree = "<group>";
+		};
+		85352C4B2DBA897B00E09271 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				85352C4A2DBA897B00E09271 /* AnalogAssist2.app */,
+				85352C5B2DBA897D00E09271 /* AnalogAssist2Tests.xctest */,
+				85352C652DBA897D00E09271 /* AnalogAssist2UITests.xctest */,
+				85C4064F2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App.app */,
+				85C4065B2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests.xctest */,
+				85C406652E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		85352C492DBA897B00E09271 /* AnalogAssist2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85352C6F2DBA897D00E09271 /* Build configuration list for PBXNativeTarget "AnalogAssist2" */;
+			buildPhases = (
+				85352C462DBA897B00E09271 /* Sources */,
+				85352C472DBA897B00E09271 /* Frameworks */,
+				85352C482DBA897B00E09271 /* Resources */,
+				85C406442E9E74A000A5F634 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85C4066E2E9E75AD00A5F634 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				85352C4C2DBA897B00E09271 /* AnalogAssist2 */,
+			);
+			name = AnalogAssist2;
+			packageProductDependencies = (
+			);
+			productName = AnalogAssist2;
+			productReference = 85352C4A2DBA897B00E09271 /* AnalogAssist2.app */;
+			productType = "com.apple.product-type.application";
+		};
+		85352C5A2DBA897D00E09271 /* AnalogAssist2Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85352C722DBA897D00E09271 /* Build configuration list for PBXNativeTarget "AnalogAssist2Tests" */;
+			buildPhases = (
+				85352C572DBA897D00E09271 /* Sources */,
+				85352C582DBA897D00E09271 /* Frameworks */,
+				85352C592DBA897D00E09271 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85352C5D2DBA897D00E09271 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				85352C5E2DBA897D00E09271 /* AnalogAssist2Tests */,
+			);
+			name = AnalogAssist2Tests;
+			packageProductDependencies = (
+			);
+			productName = AnalogAssist2Tests;
+			productReference = 85352C5B2DBA897D00E09271 /* AnalogAssist2Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		85352C642DBA897D00E09271 /* AnalogAssist2UITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85352C752DBA897D00E09271 /* Build configuration list for PBXNativeTarget "AnalogAssist2UITests" */;
+			buildPhases = (
+				85352C612DBA897D00E09271 /* Sources */,
+				85352C622DBA897D00E09271 /* Frameworks */,
+				85352C632DBA897D00E09271 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85352C672DBA897D00E09271 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				85352C682DBA897D00E09271 /* AnalogAssist2UITests */,
+			);
+			name = AnalogAssist2UITests;
+			packageProductDependencies = (
+			);
+			productName = AnalogAssist2UITests;
+			productReference = 85352C652DBA897D00E09271 /* AnalogAssist2UITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		85C4064E2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85C406702E9E75AD00A5F634 /* Build configuration list for PBXNativeTarget "AnalogAssist2Watch Watch App" */;
+			buildPhases = (
+				85C4064B2E9E75AA00A5F634 /* Sources */,
+				85C4064C2E9E75AA00A5F634 /* Frameworks */,
+				85C4064D2E9E75AA00A5F634 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				85C406502E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */,
+			);
+			name = "AnalogAssist2Watch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "AnalogAssist2Watch Watch App";
+			productReference = 85C4064F2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		85C4065A2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85C406732E9E75AD00A5F634 /* Build configuration list for PBXNativeTarget "AnalogAssist2Watch Watch AppTests" */;
+			buildPhases = (
+				85C406572E9E75AC00A5F634 /* Sources */,
+				85C406582E9E75AC00A5F634 /* Frameworks */,
+				85C406592E9E75AC00A5F634 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85C4065D2E9E75AC00A5F634 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				85C4065E2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests */,
+			);
+			name = "AnalogAssist2Watch Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "AnalogAssist2Watch Watch AppTests";
+			productReference = 85C4065B2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		85C406642E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85C406762E9E75AD00A5F634 /* Build configuration list for PBXNativeTarget "AnalogAssist2Watch Watch AppUITests" */;
+			buildPhases = (
+				85C406612E9E75AC00A5F634 /* Sources */,
+				85C406622E9E75AC00A5F634 /* Frameworks */,
+				85C406632E9E75AC00A5F634 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85C406672E9E75AD00A5F634 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				85C406682E9E75AD00A5F634 /* AnalogAssist2Watch Watch AppUITests */,
+			);
+			name = "AnalogAssist2Watch Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "AnalogAssist2Watch Watch AppUITests";
+			productReference = 85C406652E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		85352C422DBA897B00E09271 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					85352C492DBA897B00E09271 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					85352C5A2DBA897D00E09271 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 85352C492DBA897B00E09271;
+					};
+					85352C642DBA897D00E09271 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 85352C492DBA897B00E09271;
+					};
+					85C4064E2E9E75AA00A5F634 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					85C4065A2E9E75AC00A5F634 = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 85C4064E2E9E75AA00A5F634;
+					};
+					85C406642E9E75AC00A5F634 = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 85C4064E2E9E75AA00A5F634;
+					};
+				};
+			};
+			buildConfigurationList = 85352C452DBA897B00E09271 /* Build configuration list for PBXProject "AnalogAssist2" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 85352C412DBA897B00E09271;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 85352C4B2DBA897B00E09271 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				85352C492DBA897B00E09271 /* AnalogAssist2 */,
+				85352C5A2DBA897D00E09271 /* AnalogAssist2Tests */,
+				85352C642DBA897D00E09271 /* AnalogAssist2UITests */,
+				85C4064E2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */,
+				85C4065A2E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppTests */,
+				85C406642E9E75AC00A5F634 /* AnalogAssist2Watch Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		85352C482DBA897B00E09271 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85352C592DBA897D00E09271 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85352C632DBA897D00E09271 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C4064D2E9E75AA00A5F634 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C406592E9E75AC00A5F634 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C406632E9E75AC00A5F634 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		85352C462DBA897B00E09271 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85C4053A2E97F66400A5F634 /* DETRResnet50SemanticSegmentationF16.mlpackage in Sources */,
+				85C405452E996F1E00A5F634 /* DeepLabV3.mlmodel in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85352C572DBA897D00E09271 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85352C612DBA897D00E09271 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C4064B2E9E75AA00A5F634 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C406572E9E75AC00A5F634 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85C406612E9E75AC00A5F634 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		85352C5D2DBA897D00E09271 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85352C492DBA897B00E09271 /* AnalogAssist2 */;
+			targetProxy = 85352C5C2DBA897D00E09271 /* PBXContainerItemProxy */;
+		};
+		85352C672DBA897D00E09271 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85352C492DBA897B00E09271 /* AnalogAssist2 */;
+			targetProxy = 85352C662DBA897D00E09271 /* PBXContainerItemProxy */;
+		};
+		85C4065D2E9E75AC00A5F634 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85C4064E2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */;
+			targetProxy = 85C4065C2E9E75AC00A5F634 /* PBXContainerItemProxy */;
+		};
+		85C406672E9E75AD00A5F634 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85C4064E2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */;
+			targetProxy = 85C406662E9E75AD00A5F634 /* PBXContainerItemProxy */;
+		};
+		85C4066E2E9E75AD00A5F634 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85C4064E2E9E75AA00A5F634 /* AnalogAssist2Watch Watch App */;
+			targetProxy = 85C4066D2E9E75AD00A5F634 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		85352C6D2DBA897D00E09271 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 45DVK78V4C;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		85352C6E2DBA897D00E09271 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 45DVK78V4C;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		85352C702DBA897D00E09271 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AnalogAssist2/AnalogAssist2.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "\"AnalogAssist2/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "need camera";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		85352C712DBA897D00E09271 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AnalogAssist2/AnalogAssist2.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "\"AnalogAssist2/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "need camera";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Release;
+		};
+		85352C732DBA897D00E09271 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AnalogAssist2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AnalogAssist2";
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		85352C742DBA897D00E09271 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AnalogAssist2.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AnalogAssist2";
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Release;
+		};
+		85352C762DBA897D00E09271 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = AnalogAssist2;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		85352C772DBA897D00E09271 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = AnalogAssist2;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Release;
+		};
+		85C406712E9E75AD00A5F634 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = AnalogAssist2Watch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = YinuoWang.AnalogAssist2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		85C406722E9E75AD00A5F634 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = AnalogAssist2Watch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = YinuoWang.AnalogAssist2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = YinuoWang.AnalogAssist2.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		85C406742E9E75AD00A5F634 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 45DVK78V4C;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Yinuo.AnalogAssist2Watch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AnalogAssist2Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AnalogAssist2Watch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		85C406752E9E75AD00A5F634 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 45DVK78V4C;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Yinuo.AnalogAssist2Watch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AnalogAssist2Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AnalogAssist2Watch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		85C406772E9E75AD00A5F634 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 45DVK78V4C;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Yinuo.AnalogAssist2Watch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "AnalogAssist2Watch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		85C406782E9E75AD00A5F634 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 45DVK78V4C;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Yinuo.AnalogAssist2Watch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "AnalogAssist2Watch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		85352C452DBA897B00E09271 /* Build configuration list for PBXProject "AnalogAssist2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85352C6D2DBA897D00E09271 /* Debug */,
+				85352C6E2DBA897D00E09271 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85352C6F2DBA897D00E09271 /* Build configuration list for PBXNativeTarget "AnalogAssist2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85352C702DBA897D00E09271 /* Debug */,
+				85352C712DBA897D00E09271 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85352C722DBA897D00E09271 /* Build configuration list for PBXNativeTarget "AnalogAssist2Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85352C732DBA897D00E09271 /* Debug */,
+				85352C742DBA897D00E09271 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85352C752DBA897D00E09271 /* Build configuration list for PBXNativeTarget "AnalogAssist2UITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85352C762DBA897D00E09271 /* Debug */,
+				85352C772DBA897D00E09271 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85C406702E9E75AD00A5F634 /* Build configuration list for PBXNativeTarget "AnalogAssist2Watch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85C406712E9E75AD00A5F634 /* Debug */,
+				85C406722E9E75AD00A5F634 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85C406732E9E75AD00A5F634 /* Build configuration list for PBXNativeTarget "AnalogAssist2Watch Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85C406742E9E75AD00A5F634 /* Debug */,
+				85C406752E9E75AD00A5F634 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85C406762E9E75AD00A5F634 /* Build configuration list for PBXNativeTarget "AnalogAssist2Watch Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85C406772E9E75AD00A5F634 /* Debug */,
+				85C406782E9E75AD00A5F634 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 85352C422DBA897B00E09271 /* Project object */;
+}
