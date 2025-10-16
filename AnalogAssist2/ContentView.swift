@@ -3,7 +3,10 @@
 //
 // iPhone camera + segmentation + three metering modes (all 18% gray)
 // + WatchConnectivity: push meters/ISO to Apple Watch & receive ISO changes
-//
+// + Physical lens switching for true 0.5× / 1.0× (no stabilization crop)
+// + Seamless zoom; cap 10×
+// + Native 4:3 preview card (not full-screen) and matched overlay
+// + Auto-detect base 35mm for 1×; UI shows ≈focal length and × zoom (no lens names)
 
 import SwiftUI
 import AVFoundation
@@ -24,7 +27,7 @@ private func log(_ msg: @autoclosure () -> String) {
     #endif
 }
 
-// MARK: - Core ML raw metadata keys + safe accessor
+// MARK: - Core ML metadata
 
 private enum CoreMLMeta {
     static let description    = "com.apple.coreml.model.description"
@@ -38,7 +41,6 @@ private func metaString(_ md: MLModelDescription, _ key: String) -> String? {
     (md.metadata as NSDictionary)[key] as? String
 }
 
-// Clean up labels for display (remove quotes/backticks/whitespace)
 @inline(__always)
 private func cleanLabel(_ s: String) -> String {
     s.trimmingCharacters(in: CharacterSet(charactersIn: " \t\n\r\"'`"))
@@ -55,11 +57,10 @@ private func srgbToLinear01(_ x255: Double) -> Double {
 
 @inline(__always)
 private func linearLumaFromBGRA(_ b: Double, _ g: Double, _ r: Double) -> Double {
-    // Convert sRGB bytes to linear, then 0.2126/0.7152/0.0722
     let rl = srgbToLinear01(r)
     let gl = srgbToLinear01(g)
     let bl = srgbToLinear01(b)
-    return 0.2126*rl + 0.7152*gl + 0.0722*bl // 0..1 linear
+    return 0.2126*rl + 0.7152*gl + 0.0722*bl
 }
 
 // MARK: - Bundle + model helpers
@@ -98,7 +99,7 @@ func loadModelFromBundle(name: String, configuration cfg: MLModelConfiguration) 
                   userInfo: [NSLocalizedDescriptionKey: "No .mlmodelc/.mlpackage/.mlmodel found in bundle. Check Target Membership & Copy Bundle Resources."])
 }
 
-// MARK: - Labels: parse + discover from metadata/files
+// MARK: - Labels: parse + discover
 
 private func parseLabels(from string: String) -> [String] {
     let s = string.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -123,19 +124,13 @@ private func looksLikeLabels(_ arr: [String]) -> Bool {
 }
 
 private func findLabelsRecursively(in dict: [String: Any], path: String = "root") -> ([String], String)? {
-    let candidateKeys = Set(["labels","classes","classLabels","labelNames","categories","class_names","names","labels_csv"])
-    for (k, v) in dict {
-        if let arr = v as? [String], looksLikeLabels(arr) { return (arr, "\(path).\(k)") }
+    for (_, v) in dict {
+        if let arr = v as? [String], looksLikeLabels(arr) { return (arr, path) }
     }
     for (k, v) in dict {
         if let s = v as? String {
             let arr = parseLabels(from: s)
             if looksLikeLabels(arr) { return (arr, "\(path).\(k)") }
-        }
-    }
-    for (k, v) in dict {
-        if let sub = v as? [String: Any], candidateKeys.contains(k) {
-            if let (labels, p) = findLabelsRecursively(in: sub, path: "\(path).\(k)") { return (labels, p) }
         }
     }
     for (k, v) in dict {
@@ -201,7 +196,6 @@ func readLabelsFromBundleFiles() -> [String]? {
     return nil
 }
 
-/// Ensure we have at least `minCount` labels by padding with class_#.
 func padLabels(_ labels: [String], toAtLeast minCount: Int) -> [String] {
     if labels.count >= minCount { return labels }
     var out = labels
@@ -210,7 +204,7 @@ func padLabels(_ labels: [String], toAtLeast minCount: Int) -> [String] {
     return out
 }
 
-// MARK: - Color (HUD & overlay unified)
+// MARK: - Color utilities
 
 @inline(__always)
 private func classRGBA(_ cls: Int, boostMain: Bool) -> (r: Double, g: Double, b: Double, a: Double) {
@@ -243,7 +237,7 @@ private func colorForClassSwiftUI(_ cls: Int, boost: Bool) -> Color {
     return Color(.sRGB, red: c.r, green: c.g, blue: c.b, opacity: c.a)
 }
 
-// MARK: - WatchConnectivity (iPhone side)
+// MARK: - WatchConnectivity
 
 extension Notification.Name { static let ISOChangedFromWatch = Notification.Name("ISOChangedFromWatch") }
 
@@ -251,22 +245,17 @@ final class PhoneWatchConnectivity: NSObject, WCSessionDelegate {
     static let shared = PhoneWatchConnectivity()
     private override init() { super.init() }
 
-    // === Public API ===
     private var onISOChange: ((Double) -> Void)?
 
-    /// Call once at app launch (e.g., in @main App.init or very early on)
     func start(onISOChange: @escaping (Double) -> Void) {
         self.onISOChange = onISOChange
         guard WCSession.isSupported() else { print("[WC iOS] not supported"); return }
         let s = WCSession.default
         s.delegate = self
-        print("[WC iOS] start(): delegate set? \(s.delegate === self)")
         s.activate()
     }
 
-    /// Call whenever you want to push the latest meters/ISO to the watch
     func pushMeters(zonal: String, scene: String, subject: String, iso: Double) {
-        // Keep a snapshot for background delivery
         lastContext = [
             "meterZonal": zonal,
             "meterScene": scene,
@@ -274,14 +263,11 @@ final class PhoneWatchConnectivity: NSObject, WCSessionDelegate {
             "iso": iso
         ]
         sendLiveIfReachableAndNotEcho()
-        sendContextSnapshot() // background-safe
+        sendContextSnapshot()
     }
 
-    // === Internals ===
     private var activation: WCSessionActivationState = .notActivated
-    private var isUpdatingFromWatch = false // Option 2: source guard
-
-    // last-known snapshot for updateApplicationContext
+    private var isUpdatingFromWatch = false
     private var lastContext: [String: Any] = [
         "meterZonal": "—",
         "meterScene": "—",
@@ -289,69 +275,41 @@ final class PhoneWatchConnectivity: NSObject, WCSessionDelegate {
         "iso": 100.0
     ]
 
-    // MARK: WCSessionDelegate
-
     func session(_ session: WCSession,
                  activationDidCompleteWith activationState: WCSessionActivationState,
                  error: Error?) {
         activation = activationState
         if let e = error { print("[WC iOS] activate error: \(e.localizedDescription)") }
-        print("[WC iOS] activated state=\(activationState.rawValue), reachable=\(session.isReachable), installed=\(session.isWatchAppInstalled)")
-
-        guard session.isWatchAppInstalled else {
-            print("[WC iOS] watch app not installed; will skip sends until installed")
-            return
-        }
-
-        // Push the current snapshot so watch has immediate data
+        guard session.isWatchAppInstalled else { return }
         sendContextSnapshot()
     }
 
     #if os(iOS)
     func sessionDidBecomeInactive(_ session: WCSession) {}
-    func sessionDidDeactivate(_ session: WCSession) {
-        print("[WC iOS] didDeactivate → re-activate")
-        WCSession.default.activate()
-    }
-    func sessionReachabilityDidChange(_ session: WCSession) {
-        print("[WC iOS] reachable=\(session.isReachable)")
-    }
+    func sessionDidDeactivate(_ session: WCSession) { WCSession.default.activate() }
+    func sessionReachabilityDidChange(_ session: WCSession) {}
     #endif
 
-    // Watch → iPhone (live)
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        print("[iOS] didReceiveMessage: \(message)")
-        if let iso = message["iso"] as? Double {
-            applyISOFromWatch(iso)
-        }
+        if let iso = message["iso"] as? Double { applyISOFromWatch(iso) }
     }
-
-    // Watch → iPhone (queued)
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any]) {
-        print("[iOS] didReceiveUserInfo: \(userInfo)")
-        if let iso = userInfo["iso"] as? Double {
-            applyISOFromWatch(iso)
-        }
+        if let iso = userInfo["iso"] as? Double { applyISOFromWatch(iso) }
     }
 
     private func applyISOFromWatch(_ iso: Double) {
         DispatchQueue.main.async {
             self.isUpdatingFromWatch = true
-            self.onISOChange?(iso) // handoff into the VM callback
+            self.onISOChange?(iso)
             NotificationCenter.default.post(name: .ISOChangedFromWatch, object: nil, userInfo: ["iso": iso])
             self.isUpdatingFromWatch = false
         }
     }
 
-    // MARK: Helpers
-
     private func sendLiveIfReachableAndNotEcho() {
         guard activation == .activated else { return }
         let s = WCSession.default
-        guard s.isWatchAppInstalled else { return }
-        guard s.isReachable else { return }          // live message only when reachable
-        guard !isUpdatingFromWatch else { return }   // Option 2: prevent echo
-
+        guard s.isWatchAppInstalled, s.isReachable, !isUpdatingFromWatch else { return }
         s.sendMessage(lastContext, replyHandler: nil) { err in
             print("[WC iOS] sendMessage error: \(err.localizedDescription)")
         }
@@ -361,11 +319,8 @@ final class PhoneWatchConnectivity: NSObject, WCSessionDelegate {
         guard activation == .activated else { return }
         let s = WCSession.default
         guard s.isWatchAppInstalled else { return }
-        do {
-            try s.updateApplicationContext(lastContext) // background-safe; no reachability required
-        } catch {
-            print("[WC iOS] updateApplicationContext error: \(error.localizedDescription)")
-        }
+        do { try s.updateApplicationContext(lastContext) }
+        catch { print("[WC iOS] updateApplicationContext error: \(error.localizedDescription)") }
     }
 }
 
@@ -384,20 +339,26 @@ final class ViewModel: NSObject, ObservableObject {
     // centerCrop meta-rect
     @Published var centerCropMetaRect: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1)
 
-    // Watch sync kick
-    func pushToWatch() {
-        PhoneWatchConnectivity.shared.pushMeters(
-            zonal: meterZonal,
-            scene: meterMain,
-            subject: meterSubject,
-            iso: userISO
-        )
-    }
+    // Zoom (UI zoom 0.5× … 10×)
+    @Published var zoomFactor: CGFloat = 1.0
+    @Published var zoomText: String = "1.00×"
+    @Published var focalText: String = "≈26 mm"
+
+    var minZoom: CGFloat = 0.5
+    var maxZoom: CGFloat = 10.0
+    private var virtualBreakpoints: [CGFloat] = []
+    private(set) var baseWide35mm: CGFloat = 26.0
 
     // Camera
     let session = AVCaptureSession()
     private var request: VNCoreMLRequest?
     private var activeDevice: AVCaptureDevice?
+
+    // NEW: physical lenses + active input
+    private var ultraWide: AVCaptureDevice?
+    private var wide: AVCaptureDevice?
+    private var tele: AVCaptureDevice?
+    private var currentInput: AVCaptureDeviceInput?
 
     // Labels
     private var labels: [String] = []
@@ -406,7 +367,7 @@ final class ViewModel: NSObject, ObservableObject {
     private let inferQueue = DispatchQueue(label: "seg.infer.queue", qos: .userInitiated)
     private let frameGate = DispatchSemaphore(value: 1)
 
-    // Accuracy/time knobs
+    // Accuracy/time
     private let computeUnits: MLComputeUnits = .all
     private let frameSkip: Int = 0
     private var frameCounter: Int = 0
@@ -426,7 +387,7 @@ final class ViewModel: NSObject, ObservableObject {
     private var lastEV100: Double = .nan
     private var lastApertureN: Double = 1.8
 
-    // Subject-biased metering (all 18% gray)
+    // Subject-biased metering
     private let targetGray: Double = 0.18
     private let biasExponent: Double = 1.0
     private let biasMax: Double = 1.0
@@ -434,38 +395,27 @@ final class ViewModel: NSObject, ObservableObject {
     private let clipLow: Double = 0.02
     private let clipHigh: Double = 0.98
 
-    // Zonal metering (all 18% gray; no center emphasis)
+    // Zonal metering
     private let zoneCols: Int = 6
     private let zoneRows: Int = 6
     private let zoneTargetGray: Double = 0.18
     private let zoneClipLow: Double = 0.02
     private let zoneClipHigh: Double = 0.98
 
-    // MARK: Model & labels loading
+    // MARK: Model load
 
     func loadModel() async {
         do {
             let cfg = MLModelConfiguration()
             cfg.computeUnits = computeUnits
             let model = try loadModelFromBundle(name: "DETRResnet50SemanticSegmentationF16P8", configuration: cfg)
-
             let md = model.modelDescription
-            let prettyName =
-                metaString(md, CoreMLMeta.description) ??
-                metaString(md, CoreMLMeta.author) ??
-                metaString(md, CoreMLMeta.version) ??
-                "Core ML model"
-            log("Model loaded: \(prettyName)")
-            log("Inputs: \(md.inputDescriptionsByName.keys.sorted())")
-            log("Outputs: \(md.outputDescriptionsByName.keys.sorted())")
-            if let out = md.outputDescriptionsByName.values.first { log("First output type: \(out.type)") }
-
+            let pretty = metaString(md, CoreMLMeta.description) ?? metaString(md, CoreMLMeta.author) ?? metaString(md, CoreMLMeta.version) ?? "Core ML model"
+            log("Model loaded: \(pretty)")
             let fileLabels = readLabelsFromBundleFiles()
             let metaLabels = fileLabels ?? readSegmentationLabelsFromMetadata(model)
             let base = metaLabels ?? []
             self.labels = padLabels(base, toAtLeast: 1000)
-            log("Active labels count: \(self.labels.count)")
-
             didLoadModel(model)
         } catch {
             let msg = "The model failed to load: \(error.localizedDescription)"
@@ -480,7 +430,7 @@ final class ViewModel: NSObject, ObservableObject {
             let req = VNCoreMLRequest(model: vnModel)
             req.imageCropAndScaleOption = .centerCrop
             self.request = req
-            log("Vision request prepared (imageCropAndScaleOption = .centerCrop)")
+            log("Vision request prepared (centerCrop)")
         } catch {
             let msg = "Failed to prepare Vision model: \(error.localizedDescription)"
             log(msg)
@@ -488,7 +438,103 @@ final class ViewModel: NSObject, ObservableObject {
         }
     }
 
-    // MARK: Camera
+    // MARK: Device model detection → 35mm base for 1×
+
+    private func deviceIdentifierString() -> String {
+        #if targetEnvironment(simulator)
+        return ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "iPhone14,7"
+        #else
+        var sysinfo = utsname()
+        uname(&sysinfo)
+        let mirror = Mirror(reflecting: sysinfo.machine)
+        return mirror.children.reduce("") { id, elem in
+            guard let v = elem.value as? Int8, v != 0 else { return id }
+            return id + String(UnicodeScalar(UInt8(v)))
+        }
+        #endif
+    }
+
+    private func detectBaseWide35mm(_ id: String) -> CGFloat {
+        // Heuristic: most recent Pro models ~24mm @ 1×; others 26mm.
+        let lower = id.lowercased()
+        let prefixes24 = ["iphone15,3","iphone15,2","iphone16,1","iphone16,2","iphone17,1","iphone17,2"]
+        if prefixes24.contains(where: { lower.hasPrefix($0) }) { return 24.0 }
+        return 26.0
+    }
+
+    // MARK: - Lens discovery / formats
+
+    private func discoverLenses() {
+        let ds = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [
+                .builtInTripleCamera, .builtInDualWideCamera, .builtInDualCamera,
+                .builtInUltraWideCamera, .builtInWideAngleCamera, .builtInTelephotoCamera
+            ],
+            mediaType: .video,
+            position: .back
+        )
+        ultraWide = nil; wide = nil; tele = nil
+        for d in ds.devices {
+            switch d.deviceType {
+            case .builtInUltraWideCamera: ultraWide = d
+            case .builtInWideAngleCamera: wide = d
+            case .builtInTelephotoCamera: tele = d
+            default: break
+            }
+        }
+        if ultraWide == nil {
+            ultraWide = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back)
+        }
+        if wide == nil {
+            wide = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+        }
+        if tele == nil {
+            tele = AVCaptureDevice.default(.builtInTelephotoCamera, for: .video, position: .back)
+        }
+        log("🔎 Lenses — UW: \(ultraWide?.localizedName ?? "nil"), Wide: \(wide?.localizedName ?? "nil"), Tele: \(tele?.localizedName ?? "nil")")
+    }
+
+    private func widestFOVFormat(for device: AVCaptureDevice) -> AVCaptureDevice.Format {
+        let sorted = device.formats.sorted { a, b in
+            if a.videoFieldOfView != b.videoFieldOfView { return a.videoFieldOfView > b.videoFieldOfView }
+            let da = CMVideoFormatDescriptionGetDimensions(a.formatDescription)
+            let db = CMVideoFormatDescriptionGetDimensions(b.formatDescription)
+            if da.width != db.width { return da.width > db.width }
+            let ar = a.videoSupportedFrameRateRanges.first?.maxFrameRate ?? 0
+            let br = b.videoSupportedFrameRateRanges.first?.maxFrameRate ?? 0
+            return ar > br
+        }
+        return sorted.first ?? device.activeFormat
+    }
+
+    // MARK: - Zoom HUD
+
+    private func updateZoomHUD(_ z: CGFloat) {
+        zoomText = String(format: "%.2f×", z)
+        let equiv = baseWide35mm * z
+        focalText = String(format: "≈%.0f mm", equiv)
+    }
+
+    func clampZoom(_ z: CGFloat) -> CGFloat {
+        max(minZoom, min(maxZoom, z))
+    }
+
+    private func configureZoomRange(for device: AVCaptureDevice) {
+        let id = deviceIdentifierString()
+        baseWide35mm = detectBaseWide35mm(id)
+
+        minZoom = 0.5
+        maxZoom = min(10.0, device.maxAvailableVideoZoomFactor)
+
+        let nums = device.virtualDeviceSwitchOverVideoZoomFactors
+        virtualBreakpoints = nums.map { CGFloat(truncating: $0) }
+        if !virtualBreakpoints.isEmpty {
+            let bpStr = virtualBreakpoints.map { String(format: "%.2f×", $0) }.joined(separator: ", ")
+            log("📷 Lens switch-over points: \(bpStr)")
+        }
+    }
+
+    // MARK: - Session start / lens switch
 
     func requestAuthorizationAndStart() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -496,10 +542,8 @@ final class ViewModel: NSObject, ObservableObject {
             DispatchQueue.main.async { self.isAuthorized = true }
             startSession()
         case .notDetermined:
-            log("Requesting camera access…")
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 guard let self else { return }
-                log("Camera access: \(granted)")
                 DispatchQueue.main.async { self.isAuthorized = granted }
                 if granted { self.startSession() }
             }
@@ -519,34 +563,183 @@ final class ViewModel: NSObject, ObservableObject {
         }
 
         session.beginConfiguration()
-        session.sessionPreset = .hd1280x720
+        session.sessionPreset = .high // allow full-FoV formats
+
+        discoverLenses()
+
+        // Prefer true Wide (1.0×), else Ultra-Wide (0.5×), else Tele
+        guard let startDevice = self.wide ?? self.ultraWide ?? self.tele else {
+            let msg = "No back camera available"
+            log(msg); DispatchQueue.main.async { self.errorMessage = msg }
+            session.commitConfiguration(); return
+        }
 
         do {
-            guard let device = AVCaptureDevice.default(for: .video) else {
-                let msg = "No camera device available"
-                log(msg); DispatchQueue.main.async { self.errorMessage = msg }
-                session.commitConfiguration(); return
+            let input = try AVCaptureDeviceInput(device: startDevice)
+            guard session.canAddInput(input) else {
+                session.commitConfiguration()
+                log("Cannot add camera input.")
+                return
             }
-            let input = try AVCaptureDeviceInput(device: device)
-            if session.canAddInput(input) { session.addInput(input) }
+            session.addInput(input)
+            self.currentInput = input
+            self.activeDevice = startDevice
 
             let out = AVCaptureVideoDataOutput()
             out.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
             out.alwaysDiscardsLateVideoFrames = true
             out.setSampleBufferDelegate(self, queue: DispatchQueue(label: "seg.capture.queue", qos: .userInteractive))
-            if session.canAddOutput(out) { session.addOutput(out) }
+            guard session.canAddOutput(out) else {
+                session.removeInput(input)
+                session.commitConfiguration()
+                log("Cannot add video output.")
+                return
+            }
+            session.addOutput(out)
 
-            self.activeDevice = device
+            // Disable stabilization crop
+            if let conn = out.connection(with: .video), conn.isVideoStabilizationSupported {
+                conn.preferredVideoStabilizationMode = .off
+            }
 
-            log("Camera configured. Preset: \(session.sessionPreset.rawValue)")
+            try startDevice.lockForConfiguration()
+            startDevice.activeFormat = widestFOVFormat(for: startDevice)
+            startDevice.videoZoomFactor = 1.0
+            startDevice.unlockForConfiguration()
+
+            configureZoomRange(for: startDevice)
+
+            DispatchQueue.main.async { [weak self] in
+                self?.zoomFactor = 1.0
+                self?.updateZoomHUD(1.0)
+            }
+
+            session.commitConfiguration()
+            session.startRunning()
+
+            log("Camera configured. Using \(startDevice.localizedName). Preset: \(session.sessionPreset.rawValue)")
+            log(String(format: "Zoom range (hw): %.2f× .. %.2f×",
+                       startDevice.minAvailableVideoZoomFactor,
+                       min(startDevice.maxAvailableVideoZoomFactor, 10.0)))
+
+
         } catch {
             let msg = "Camera setup failed: \(error.localizedDescription)"
             log(msg); DispatchQueue.main.async { self.errorMessage = msg }
+            session.commitConfiguration()
+        }
+    }
+
+    private func switchToDevice(_ newDevice: AVCaptureDevice, targetZoom: CGFloat) {
+        guard let oldInput = currentInput else { return }
+
+        session.beginConfiguration()
+        session.removeInput(oldInput)
+
+        do {
+            let input = try AVCaptureDeviceInput(device: newDevice)
+            if session.canAddInput(input) {
+                session.addInput(input)
+                self.currentInput = input
+                self.activeDevice = newDevice
+            } else {
+                session.addInput(oldInput)
+                session.commitConfiguration()
+                return
+            }
+        } catch {
+            log("Switch device input failed: \(error.localizedDescription)")
+            session.addInput(oldInput)
+            session.commitConfiguration()
+            return
         }
 
+        if let out = session.outputs.compactMap({ $0 as? AVCaptureVideoDataOutput }).first,
+           let conn = out.connection(with: .video),
+           conn.isVideoStabilizationSupported {
+            conn.preferredVideoStabilizationMode = .off
+        }
+
+        do {
+            try newDevice.lockForConfiguration()
+            newDevice.activeFormat = widestFOVFormat(for: newDevice)
+            let clamped = max(newDevice.minAvailableVideoZoomFactor,
+                              min(newDevice.maxAvailableVideoZoomFactor, targetZoom))
+            newDevice.videoZoomFactor = clamped
+            newDevice.unlockForConfiguration()
+        } catch {
+            log("Switch configure failed: \(error.localizedDescription)")
+        }
+
+        configureZoomRange(for: newDevice)
         session.commitConfiguration()
-        session.startRunning()
-        log("Session started.")
+
+        DispatchQueue.main.async { [weak self] in
+            self?.zoomFactor = max(0.5, min(10.0, self?.zoomFactor ?? 1.0))
+            self?.updateZoomHUD(self?.zoomFactor ?? 1.0)
+        }
+    }
+
+    // MARK: - Zoom mapping (UI 0.5×..10× → lens + device zoom)
+
+    func applyZoom(_ z: CGFloat, ramp: Bool) {
+        let uiZoom = max(0.5, min(10.0, z))
+
+        // Decide lens region
+        // 0.50×..0.75× → Ultra-Wide
+        // 0.75×..1.50× → Wide
+        // >1.50×       → Tele if present, else Wide
+        let useUW   = uiZoom < 0.75
+        let useTele = uiZoom > 1.50 && tele != nil
+
+        let targetDevice: AVCaptureDevice? = {
+            if useUW { return ultraWide ?? wide }
+            if useTele { return tele ?? wide }
+            return wide ?? ultraWide ?? tele
+        }()
+
+        guard let device = targetDevice else { return }
+
+        // Per-lens mapping from UI zoom → device.videoZoomFactor (≈native)
+        var targetDeviceZoom: CGFloat = 1.0
+        if device == ultraWide {
+            // Map 0.50 UI → 1.0 device, 0.75 UI → ~1.5 device
+            let t = (uiZoom - 0.5) / (0.75 - 0.5) // 0..1
+            targetDeviceZoom = 1.0 + t * 0.5      // 1.0..1.5
+        } else if device == wide {
+            if uiZoom < 1.0 {
+                // Don't “zoom out” on Wide — switch to UW for <1.0
+                targetDeviceZoom = 1.0
+            } else {
+                targetDeviceZoom = uiZoom         // 1.0..1.5
+            }
+        } else if device == tele {
+            // Start Tele at 1.0 at 1.5× and scale to ~6× at 10×
+            let t = max(0, (uiZoom - 1.5) / (10.0 - 1.5))
+            targetDeviceZoom = 1.0 + t * 5.0
+        }
+
+        // Switch lens if needed
+        if activeDevice?.uniqueID != device.uniqueID {
+            switchToDevice(device, targetZoom: targetDeviceZoom)
+        } else {
+            // Same device: set zoom
+            do {
+                try device.lockForConfiguration()
+                let clamped = max(device.minAvailableVideoZoomFactor,
+                                  min(device.maxAvailableVideoZoomFactor, targetDeviceZoom))
+                if ramp { device.ramp(toVideoZoomFactor: clamped, withRate: 5) }
+                else    { device.videoZoomFactor = clamped }
+                device.unlockForConfiguration()
+            } catch {
+                log("Zoom config failed: \(error.localizedDescription)")
+            }
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.zoomFactor = uiZoom
+            self?.updateZoomHUD(uiZoom)
+        }
     }
 
     // MARK: Inference (+ saliency, TTA, filtering)
@@ -606,7 +799,6 @@ final class ViewModel: NSObject, ObservableObject {
                 }
             }
 
-            // 1) 原始推理
             guard let pass1 = performOnce(orientation: exif) else {
                 DispatchQueue.main.async { self.frameGate.signal() }
                 return
@@ -617,7 +809,6 @@ final class ViewModel: NSObject, ObservableObject {
             let mainIdx = pass1.mainIdx
             let mainName = pass1.mainName
 
-            // 2) flip-TTA（可选）
             if self.useFlipTTA {
                 let exifFlip: CGImagePropertyOrientation = {
                     switch exif {
@@ -640,15 +831,13 @@ final class ViewModel: NSObject, ObservableObject {
                 }
             }
 
-            // 3) 3×3 模式滤波（可选）
             if self.useModeFilter3x3 {
                 self.mode3x3(&fusedIndex, W: W, H: H)
             }
 
-            // 4) 由融合后的 index map 生成最终 overlay + 百分比
             let (finalImg, finalPct, counts) = self.overlayFromIndexMap(indexMap: fusedIndex, W: W, H: H, mainIdx: mainIdx)
 
-            // 5) 主体偏置测光（B，18% 灰 + 面积权重）
+            // subject-biased metering
             if !self.lastEV100.isNaN {
                 if let (deltaEV, w) = self.subjectBiasedDeltaEV(from: pixelBuffer,
                                                                 mask: fusedIndex, W: W, H: H,
@@ -662,9 +851,8 @@ final class ViewModel: NSObject, ObservableObject {
                     let biasPct = Int((min(1.0, w)) * 100.0)
                     let text = "Main-biased: \(self.fmtAperture(N)) · \(self.fmtShutter(tUser)) @ ISO \(Int(userS))  (\(Int(areaPct))% area · bias \(biasPct)%)"
                     DispatchQueue.main.async { [weak self] in
-                        guard let self else { return }
-                        self.meterSubject = text
-                        self.pushToWatch()
+                        self?.meterSubject = text
+                        self?.pushToWatch()
                     }
                 }
             }
@@ -686,7 +874,7 @@ final class ViewModel: NSObject, ObservableObject {
         DispatchQueue.main.async { [weak self] in self?.errorMessage = msg; self?.frameGate.signal() }
     }
 
-    // === SUBJECTNESS === utilities
+    // SUBJECTNESS
 
     private func semanticPrior(for label: String) -> Double {
         let s = label.lowercased()
@@ -711,9 +899,7 @@ final class ViewModel: NSObject, ObservableObject {
         var bestScore = -Double.greatestFiniteMagnitude
 
         for i in 0..<counts.count {
-            let cnt = counts[i]
-            if cnt == 0 { continue }
-
+            let cnt = counts[i]; if cnt == 0 { continue }
             let name = i < labels.count ? labels[i] : "class_\(i)"
             let prior = semanticPrior(for: name)
             let salAvg = saliencySum[i] / Double(max(1, cnt))
@@ -759,21 +945,15 @@ final class ViewModel: NSObject, ObservableObject {
         }
     }
 
-    // MARK: - Metering helpers (EV math + formatting)
+    // MARK: EV math + formatting
 
     private func fmtShutter(_ t: Double) -> String {
         if t <= 0 { return "—" }
-        if t < 1.0 {
-            let denom = max(1, Int((1.0 / t).rounded()))
-            return "1/\(denom)s"
-        } else {
-            let val = (t * 10).rounded() / 10.0
-            return "\(val)s"
-        }
+        if t < 1.0 { return "1/\(max(1, Int((1.0 / t).rounded())))s" }
+        let val = (t * 10).rounded() / 10.0
+        return "\(val)s"
     }
-    private func fmtAperture(_ n: Double) -> String {
-        String(format: "f/%.1f", n)
-    }
+    private func fmtAperture(_ n: Double) -> String { String(format: "f/%.1f", n) }
     private func ev100(n: Double, t: Double, s: Double) -> Double {
         guard n > 0, t > 0, s > 0 else { return .nan }
         return log2((n*n)/t) - log2(s/100.0)
@@ -787,26 +967,18 @@ final class ViewModel: NSObject, ObservableObject {
         return sqrt(max(1e-8, val))
     }
 
-    // === Postprocess dispatch ===
-
     private func postprocessFeatureValue(_ obs: VNCoreMLFeatureValueObservation,
                                          saliencyPB: CVPixelBuffer?)
     -> (overlay: CGImage, percentages: [(String, Double, Int)], mainName: String, mainIdx: Int, indexMap: [Int], W: Int, H: Int)? {
-        guard let arr = obs.featureValue.multiArrayValue else {
-            log("FeatureValue not MultiArray")
-            return nil
-        }
+        guard let arr = obs.featureValue.multiArrayValue else { return nil }
         let shape = arr.shape.map { Int(truncating: $0) }
         switch shape.count {
         case 3: return postprocessLogitsCHW(arr, saliencyPB: saliencyPB)
         case 2: return postprocessLabelMapHW(arr, saliencyPB: saliencyPB)
-        default:
-            log("Unsupported MultiArray rank \(shape.count) (expect 2 or 3)")
-            return nil
+        default: return nil
         }
     }
 
-    // logits [C,H,W]
     private func postprocessLogitsCHW(_ arr: MLMultiArray,
                                       saliencyPB: CVPixelBuffer?)
     -> (overlay: CGImage, percentages: [(String, Double, Int)], mainName: String, mainIdx: Int, indexMap: [Int], W: Int, H: Int)? {
@@ -815,9 +987,7 @@ final class ViewModel: NSObject, ObservableObject {
         let C = shape[0], H = shape[1], W = shape[2]
         let pxCount = W * H
 
-        if labels.count < max(1000, C) {
-            labels = padLabels(labels, toAtLeast: max(1000, C))
-        }
+        if labels.count < max(1000, C) { labels = padLabels(labels, toAtLeast: max(1000, C)) }
 
         var counts = Array(repeating: 0, count: C)
         var overlay = [UInt32](repeating: 0, count: pxCount)
@@ -838,8 +1008,7 @@ final class ViewModel: NSObject, ObservableObject {
             for y in 0..<H {
                 for x in 0..<W {
                     let base = y*sH + x*sW
-                    var best = 0
-                    var bestV: Float32 = -Float.greatestFiniteMagnitude
+                    var best = 0; var bestV: Float32 = -Float.greatestFiniteMagnitude
                     for c in 0..<C {
                         let v = p[base + c*sC]
                         if v > bestV { bestV = v; best = c }
@@ -855,8 +1024,7 @@ final class ViewModel: NSObject, ObservableObject {
             for y in 0..<H {
                 for x in 0..<W {
                     let base = y*sH + x*sW
-                    var best = 0
-                    var bestV: Double = -Double.greatestFiniteMagnitude
+                    var best = 0; var bestV: Double = -Double.greatestFiniteMagnitude
                     for c in 0..<C {
                         let v = p[base + c*sC]
                         if v > bestV { bestV = v; best = c }
@@ -872,8 +1040,7 @@ final class ViewModel: NSObject, ObservableObject {
             for y in 0..<H {
                 for x in 0..<W {
                     let base = y*sH + x*sW
-                    var best = 0
-                    var bestV = -Float.greatestFiniteMagnitude
+                    var best = 0; var bestV = -Float.greatestFiniteMagnitude
                     for c in 0..<C {
                         let bits = p[base + c*sC]
                         let v = Float(Float16(bitPattern: bits))
@@ -885,9 +1052,7 @@ final class ViewModel: NSObject, ObservableObject {
                     sumX[best] += Double(x); sumY[best] += Double(y)
                 }
             }
-        default:
-            log("Unsupported logits dataType \(arr.dataType)")
-            return nil
+        default: return nil
         }
 
         var centroid = Array(repeating: (0.0, 0.0), count: C)
@@ -907,7 +1072,6 @@ final class ViewModel: NSObject, ObservableObject {
         return (img, pct, mainName, mainIdx, indexMap, W, H)
     }
 
-    // label map [H,W]
     private func postprocessLabelMapHW(_ arr: MLMultiArray,
                                        saliencyPB: CVPixelBuffer?)
     -> (overlay: CGImage, percentages: [(String, Double, Int)], mainName: String, mainIdx: Int, indexMap: [Int], W: Int, H: Int)? {
@@ -1006,7 +1170,7 @@ final class ViewModel: NSObject, ObservableObject {
         }
 
         let (img, pct) = finalizeOverlay(W: W, H: H, counts: counts, overlay: &overlay)
-        log("Observed classes 0...\(maxClsSeen >= 0 ? maxClsSeen : 0); counts size \(counts.count); labels \(labels.count)")
+        log("Observed classes up to  \(maxClsSeen); counts size \(counts.count); labels \(labels.count)")
         return (img, pct, mainName, mainIdx, indexMap, W, H)
     }
 
@@ -1080,7 +1244,7 @@ final class ViewModel: NSObject, ObservableObject {
         return (img, pct, mainName, mainIdx, indexMap, W, H)
     }
 
-    // MARK: - 主体偏置 ΔEV（18% 灰 + 面积权重）
+    // Subject-biased ΔEV
 
     private func subjectBiasedDeltaEV(from pb: CVPixelBuffer,
                                       mask: [Int], W: Int, H: Int,
@@ -1102,7 +1266,7 @@ final class ViewModel: NSObject, ObservableObject {
         guard let base = CVPixelBufferGetBaseAddress(pb) else { return nil }
         let p = base.bindMemory(to: UInt8.self, capacity: bpr * srcH)
 
-        // map center-crop
+        // map center crop
         let cropX = cropRectNorm.origin.x * Double(srcW)
         let cropY = cropRectNorm.origin.y * Double(srcH)
         let cropW = cropRectNorm.width  * Double(srcW)
@@ -1122,11 +1286,9 @@ final class ViewModel: NSObject, ObservableObject {
                 let bin = Int(min(255.0, max(0.0, yLin * 255.0)).rounded())
 
                 if mask[y*W + x] == mainIdx {
-                    histMain[bin] &+= 1
-                    mainCount &+= 1
+                    histMain[bin] &+= 1; mainCount &+= 1
                 } else {
-                    histOther[bin] &+= 1
-                    otherCount &+= 1
+                    histOther[bin] &+= 1; otherCount &+= 1
                 }
             }
         }
@@ -1172,7 +1334,7 @@ final class ViewModel: NSObject, ObservableObject {
         return Double(c) / Double(total)
     }
 
-    // MARK: - 分区测光（18% 灰）
+    // Zonal metering
 
     private func zonalDeltaEV(from pb: CVPixelBuffer,
                               cropRectNorm: CGRect) -> Double? {
@@ -1268,7 +1430,7 @@ final class ViewModel: NSObject, ObservableObject {
         return sorted.last?.0 ?? 0
     }
 
-    // MARK: - Finalization & helpers
+    // Finalization
 
     private func finalizeOverlay(W: Int, H: Int,
                                  counts: [Int],
@@ -1362,144 +1524,80 @@ final class ViewModel: NSObject, ObservableObject {
         let (img, pct) = finalizeOverlay(W: W, H: H, counts: counts, overlay: &overlay)
         return (img, pct, counts)
     }
+
+    // Watch sync kick
+    func pushToWatch() {
+        PhoneWatchConnectivity.shared.pushMeters(
+            zonal: meterZonal, scene: meterMain, subject: meterSubject, iso: userISO
+        )
+    }
 }
 
 extension ViewModel: @unchecked Sendable {}
 
-extension ViewModel: AVCaptureVideoDataOutputSampleBufferDelegate {
-    nonisolated func captureOutput(_ output: AVCaptureOutput,
-                                   didOutput sampleBuffer: CMSampleBuffer,
-                                   from connection: AVCaptureConnection) {
-        guard let pb = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        if frameGate.wait(timeout: .now()) != .success { return }
-
-        frameCounter &+= 1
-        if frameSkip > 0, frameCounter % (frameSkip + 1) != 0 {
-            frameGate.signal(); return
-        }
-
-        // center-crop rect in video coords
-        let srcW = CGFloat(CVPixelBufferGetWidth(pb))
-        let srcH = CGFloat(CVPixelBufferGetHeight(pb))
-        var metaRect = CGRect(x: 0, y: 0, width: 1, height: 1)
-        if srcW > srcH {
-            let wNorm = srcH / srcW
-            metaRect = CGRect(x: (1 - wNorm) * 0.5, y: 0, width: wNorm, height: 1)
-        } else if srcH > srcW {
-            let hNorm = srcW / srcH
-            metaRect = CGRect(x: 0, y: (1 - hNorm) * 0.5, width: 1, height: hNorm)
-        }
-        DispatchQueue.main.async { [weak self] in
-            self?.centerCropMetaRect = metaRect
-        }
-
-        // orientation
-        let angleDeg: Double
-        if #available(iOS 17.0, macOS 14.0, *) { angleDeg = connection.videoRotationAngle }
-        else {
-            #if os(iOS)
-            switch connection.videoOrientation {
-            case .portrait: angleDeg = 90
-            case .portraitUpsideDown: angleDeg = 270
-            case .landscapeRight: angleDeg = 0
-            case .landscapeLeft: angleDeg = 180
-            @unknown default: angleDeg = 0
-            }
-            #else
-            angleDeg = 0
-            #endif
-        }
-        let mirrored = connection.isVideoMirrored
-        let exif = exifFrom(angleDegrees: angleDeg, mirrored: mirrored)
-
-        // === Meter A: 设备曝光 → EV → 用户 ISO 等效
-        if let dev = self.activeDevice {
-            let N = Double(dev.lensAperture)
-            let t = Double(CMTimeGetSeconds(dev.exposureDuration))
-            let S = Double(dev.iso)
-            if N > 0 && t > 0 && S > 0 {
-                let EV100 = ev100(n: N, t: t, s: S)
-                self.lastEV100 = EV100
-                self.lastApertureN = N
-
-                let userS = max(25.0, min(204800.0, self.userISO))
-                let tUser = solveShutter(ev100: EV100, n: N, s: userS)
-                let main = "\(fmtAperture(N)) · \(fmtShutter(tUser)) @ ISO \(Int(userS))"
-
-                let tTarget = self.targetShutterForApertureSuggestions
-                let nSolve = solveAperture(ev100: EV100, t: tTarget, s: userS)
-                let altsTuples: [(n: Double, t: Double)] = self.fullStops.map { stop in
-                    let tAlt = solveShutter(ev100: EV100, n: stop, s: userS)
-                    return (stop, tAlt)
-                }
-                let sorted = altsTuples.sorted { abs($0.n - nSolve) < abs($1.n - nSolve) }
-                let alts = sorted.prefix(5).map { "\(fmtAperture($0.n)) · \(fmtShutter($0.t))" }
-
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    self.meterMain = main
-                    self.meterAlternates = Array(alts)
-                    self.pushToWatch()
-                }
-            }
-        }
-
-        // === Meter C: Zonal（18% 灰；置顶）
-        if !self.lastEV100.isNaN {
-            if let dEVz = self.zonalDeltaEV(from: pb, cropRectNorm: self.centerCropMetaRect) {
-                let N = self.lastApertureN
-                let userS = max(25.0, min(204800.0, self.userISO))
-                let evTarget = self.lastEV100 - dEVz
-                let tUser = self.solveShutter(ev100: evTarget, n: N, s: userS)
-                let txt = "Zonal: \(self.fmtAperture(N)) · \(self.fmtShutter(tUser)) @ ISO \(Int(userS))"
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    self.meterZonal = txt
-                    self.pushToWatch()
-                }
-            }
-        }
-
-        // Run segmentation; subject-biased meter updated after inference
-        runInference(on: pb, exif: exif)
-    }
-}
-
-// MARK: - SwiftUI root + HUD
+// MARK: - SwiftUI root + HUD + Zoom bar (4:3 preview card)
 
 struct SegmentedCameraRootView: View {
     @StateObject private var vm = ViewModel()
+    @State private var pinchStartZoom: CGFloat = 1.0
 
     private func startWatchSync() {
         PhoneWatchConnectivity.shared.start { newISO in
-            print("[VM] userISO <- \(newISO)")
             vm.userISO = max(25.0, min(204800.0, newISO))
         }
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            #if os(iOS)
-            CameraView_iOS(session: vm.session,
-                           overlayImage: vm.overlayImage,
-                           centerCropMetaRect: vm.centerCropMetaRect)
-                .ignoresSafeArea()
-            #else
-            CameraView_macOS(session: vm.session, overlayImage: vm.overlayImage)
-            #endif
+        ZStack {
+            Color.black.ignoresSafeArea()
 
-            HUDView(vm: vm,
-                    percentages: vm.classPercentages,
-                    error: vm.errorMessage,
-                    last: vm.lastUpdateText,
-                    mainText: vm.mainSubjectText,
-                    mainClassIndex: vm.mainClassIndex)
-                .padding()
+            VStack(spacing: 12) {
+                // 4:3 preview card; compact height so there's room for UI
+                #if os(iOS)
+                CameraView_iOS(session: vm.session,
+                               overlayImage: vm.overlayImage,
+                               centerCropMetaRect: vm.centerCropMetaRect)
+                    .aspectRatio(3/4, contentMode: .fit)  // Native sensor 4:3 (portrait)
+                    .frame(maxWidth: .infinity)
+                    .frame(maxHeight: 480)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(.white.opacity(0.15), lineWidth: 1))
+                    // Pinch-to-zoom on the preview itself
+                    .gesture(
+                        MagnificationGesture()
+                            .onChanged { scale in
+                                let newZ = pinchStartZoom * scale
+                                vm.applyZoom(newZ, ramp: false)
+                            }
+                            .onEnded { _ in
+                                pinchStartZoom = vm.zoomFactor
+                                vm.applyZoom(vm.zoomFactor, ramp: true)
+                            }
+                    )
+                #else
+                CameraView_macOS(session: vm.session, overlayImage: vm.overlayImage)
+                    .frame(height: 420)
+                #endif
+
+                HUDView(vm: vm,
+                        percentages: vm.classPercentages,
+                        error: vm.errorMessage,
+                        last: vm.lastUpdateText,
+                        mainText: vm.mainSubjectText,
+                        mainClassIndex: vm.mainClassIndex)
+                .padding(.horizontal)
+
+                ZoomBarView(vm: vm)
+                    .padding(.horizontal)
+            }
+            .padding(.top, 12)
+            .padding(.bottom, 24)
         }
         .task { await vm.loadModel() }
         .onAppear {
             vm.requestAuthorizationAndStart()
-            startWatchSync()     // 启动 iPhone ↔︎ Watch 通讯
+            startWatchSync()
+            pinchStartZoom = vm.zoomFactor
         }
     }
 }
@@ -1526,15 +1624,11 @@ struct HUDView: View {
                 #endif
             }
 
-            // C) Zonal（置顶）
-            Text(vm.meterZonal)
-                .foregroundColor(.white)
-                .font(.subheadline)
-                .bold()
+            // Zonal
+            Text(vm.meterZonal).foregroundColor(.white).font(.subheadline).bold()
 
-            // A) Scene-equivalent
-            Text(vm.meterMain)
-                .foregroundColor(.white).font(.subheadline)
+            // Scene-equivalent
+            Text(vm.meterMain).foregroundColor(.white).font(.subheadline)
 
             if !vm.meterAlternates.isEmpty {
                 Text(vm.meterAlternates.joined(separator: "  •  "))
@@ -1543,10 +1637,8 @@ struct HUDView: View {
                     .lineLimit(2)
             }
 
-            // B) Main-biased
-            Text(vm.meterSubject)
-                .foregroundColor(.white)
-                .font(.subheadline)
+            // Main-biased
+            Text(vm.meterSubject).foregroundColor(.white).font(.subheadline)
 
             Divider().background(Color.white.opacity(0.3))
 
@@ -1583,6 +1675,39 @@ struct HUDView: View {
     }
 }
 
+struct ZoomBarView: View {
+    @ObservedObject var vm: ViewModel
+    @State private var isEditing = false
+
+    var body: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Spacer()
+                HStack(spacing: 10) {
+                    Text(vm.focalText).foregroundColor(.white)
+                    Text(vm.zoomText).foregroundColor(.white).monospacedDigit()
+                }
+            }
+            #if os(iOS)
+            Slider(value: $vm.zoomFactor,
+                   in: vm.minZoom...vm.maxZoom,
+                   onEditingChanged: { editing in
+                       isEditing = editing
+                       vm.applyZoom(vm.zoomFactor, ramp: !editing) // snap smooth on release
+                   })
+            #else
+            Slider(value: $vm.zoomFactor, in: vm.minZoom...vm.maxZoom)
+                .onChange(of: vm.zoomFactor) { vm.applyZoom($0, ramp: false) }
+            #endif
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(.black.opacity(0.55))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(.bottom, 12)
+    }
+}
+
 // MARK: - Platform wrappers
 
 #if os(iOS)
@@ -1596,14 +1721,16 @@ final class PreviewView_iOS: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .black
-        videoLayer.videoGravity = .resizeAspectFill
+        // Keep entire video within bounds (no crop)
+        videoLayer.videoGravity = .resizeAspect
 
-        overlayLayer.contentsGravity = .resizeAspectFill
+        overlayLayer.contentsGravity = .resizeAspect
         overlayLayer.isOpaque = false
         overlayLayer.masksToBounds = true
         overlayLayer.opacity = 1.0
         overlayLayer.compositingFilter = "sourceOver"
         overlayLayer.contentsScale = UIScreen.main.scale
+        overlayLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
 
         layer.addSublayer(overlayLayer)
     }
@@ -1612,6 +1739,7 @@ final class PreviewView_iOS: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        videoLayer.frame = bounds
     }
 }
 
@@ -1633,10 +1761,12 @@ struct CameraView_iOS: UIViewRepresentable {
 
         uiView.overlayLayer.contents = overlayImage
         uiView.overlayLayer.contentsScale = UIScreen.main.scale
-        uiView.overlayLayer.contentsGravity = .resizeAspectFill
+        uiView.overlayLayer.contentsGravity = .resizeAspect
 
+        // Map Vision center-crop meta rect to preview coordinates
         let layerRect = uiView.videoLayer.layerRectConverted(fromMetadataOutputRect: centerCropMetaRect)
         uiView.overlayLayer.frame = layerRect
+        uiView.overlayLayer.position = CGPoint(x: layerRect.midX, y: layerRect.midY)
 
         var t = CGAffineTransform.identity
         if rotateOverlayCW90 { t = t.rotated(by: .pi / 2) }
@@ -1663,9 +1793,9 @@ final class PreviewView_macOS: NSView {
         layer?.addSublayer(videoLayer)
         layer?.addSublayer(overlayLayer)
 
-        videoLayer.videoGravity = .resizeAspectFill
+        videoLayer.videoGravity = .resizeAspect
 
-        overlayLayer.contentsGravity = .resizeAspectFill
+        overlayLayer.contentsGravity = .resizeAspect
         overlayLayer.isOpaque = false
         overlayLayer.masksToBounds = true
         overlayLayer.opacity = 1.0
@@ -1706,6 +1836,105 @@ struct CameraView_macOS: NSViewRepresentable {
     }
 }
 #endif
+
+// MARK: - Capture delegate
+
+extension ViewModel: AVCaptureVideoDataOutputSampleBufferDelegate {
+    nonisolated func captureOutput(_ output: AVCaptureOutput,
+                                   didOutput sampleBuffer: CMSampleBuffer,
+                                   from connection: AVCaptureConnection) {
+        guard let pb = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        if frameGate.wait(timeout: .now()) != .success { return }
+
+        frameCounter &+= 1
+        if frameSkip > 0, frameCounter % (frameSkip + 1) != 0 {
+            frameGate.signal(); return
+        }
+
+        // center-crop rect in video coords (for overlay mapping)
+        let srcW = CGFloat(CVPixelBufferGetWidth(pb))
+        let srcH = CGFloat(CVPixelBufferGetHeight(pb))
+        var metaRect = CGRect(x: 0, y: 0, width: 1, height: 1)
+        if srcW > srcH {
+            let wNorm = srcH / srcW
+            metaRect = CGRect(x: (1 - wNorm) * 0.5, y: 0, width: wNorm, height: 1)
+        } else if srcH > srcW {
+            let hNorm = srcW / srcH
+            metaRect = CGRect(x: 0, y: (1 - hNorm) * 0.5, width: 1, height: hNorm)
+        }
+        // ✅ No artificial inset/scaling
+        DispatchQueue.main.async { [weak self] in self?.centerCropMetaRect = metaRect }
+
+        // orientation
+        let angleDeg: Double
+        if #available(iOS 17.0, macOS 14.0, *) { angleDeg = connection.videoRotationAngle }
+        else {
+            #if os(iOS)
+            switch connection.videoOrientation {
+            case .portrait: angleDeg = 90
+            case .portraitUpsideDown: angleDeg = 270
+            case .landscapeRight: angleDeg = 0
+            case .landscapeLeft: angleDeg = 180
+            @unknown default: angleDeg = 0
+            }
+            #else
+            angleDeg = 0
+            #endif
+        }
+        let mirrored = connection.isVideoMirrored
+        let exif = exifFrom(angleDegrees: angleDeg, mirrored: mirrored)
+
+        // Meter A: device exposure → EV → user ISO equivalent
+        if let dev = self.activeDevice {
+            let N = Double(dev.lensAperture)
+            let t = Double(CMTimeGetSeconds(dev.exposureDuration))
+            let S = Double(dev.iso)
+            if N > 0 && t > 0 && S > 0 {
+                let EV100 = ev100(n: N, t: t, s: S)
+                self.lastEV100 = EV100
+                self.lastApertureN = N
+
+                let userS = max(25.0, min(204800.0, self.userISO))
+                let tUser = solveShutter(ev100: EV100, n: N, s: userS)
+                let main = "\(fmtAperture(N)) · \(fmtShutter(tUser)) @ ISO \(Int(userS))"
+
+                let tTarget = self.targetShutterForApertureSuggestions
+                let nSolve = solveAperture(ev100: EV100, t: tTarget, s: userS)
+                let altsTuples: [(n: Double, t: Double)] = self.fullStops.map { stop in
+                    let tAlt = solveShutter(ev100: EV100, n: stop, s: userS)
+                    return (stop, tAlt)
+                }
+                let sorted = altsTuples.sorted { abs($0.n - nSolve) < abs($1.n - nSolve) }
+                let alts = sorted.prefix(5).map { "\(fmtAperture($0.n)) · \(fmtShutter($0.t))" }
+
+                DispatchQueue.main.async { [weak self] in
+                    self?.meterMain = main
+                    self?.meterAlternates = Array(alts)
+                    self?.pushToWatch()
+                }
+            }
+        }
+
+        // Meter C: Zonal
+        if !self.lastEV100.isNaN {
+            if let dEVz = self.zonalDeltaEV(from: pb, cropRectNorm: self.centerCropMetaRect) {
+                let N = self.lastApertureN
+                let userS = max(25.0, min(204800.0, self.userISO))
+                let evTarget = self.lastEV100 - dEVz
+                let tUser = self.solveShutter(ev100: evTarget, n: N, s: userS)
+                let txt = "Zonal: \(self.fmtAperture(N)) · \(self.fmtShutter(tUser)) @ ISO \(Int(userS))"
+                DispatchQueue.main.async { [weak self] in
+                    self?.meterZonal = txt
+                    self?.pushToWatch()
+                }
+            }
+        }
+
+        // Run segmentation
+        runInference(on: pb, exif: exif)
+    }
+}
+
 #Preview {
     SegmentedCameraRootView()
 }
