@@ -1,3 +1,5 @@
+# GoFundMe: (https://www.gofundme.com/f/help-launch-analogassist2-a-smart-light-meter-for-film)
+
 # 📸 AnalogAssist2
 
 **AnalogAssist2** is an experimental camera assistant app built for iOS and Apple Watch that combines **real-time computer vision**, **Core ML segmentation**, and **classic exposure metering** principles to help photographers make intelligent, scene-aware exposure decisions — just like using a handheld light meter for analog cameras.
