@@ -1,4 +1,4 @@
-# GoFundMe: (https://www.gofundme.com/f/help-launch-analogassist2-a-smart-light-meter-for-film)
+# GoFundMe: https://www.gofundme.com/f/help-launch-analogassist2-a-smart-light-meter-for-film
 
 # 📸 AnalogAssist2
 
